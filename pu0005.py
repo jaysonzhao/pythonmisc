@@ -27,14 +27,18 @@ def oracle_data():
     cursorV = conn.cursor()
 
     x_data = np.zeros(1)
-    y_row = np.zeros(2)
-    y_data = np.zeros(2)  # zeros(1)创建长度1的全0数组(这个是一维的只有一行)
-    x_row = np.zeros(1)
+    y_row = np.zeros(1)   #y目前只存放环节名称
+    y_data = np.zeros(1)  #zeros(1)创建长度1的全0数组(这个是一维的只有一行)
+    x_row = np.zeros(1)   #x目前只存放金额
+    print(len(x_data))
+    print(len(y_data))
+
     # 堆叠数组：stack()，hstack()，vstack()
     for result in cursor:  # 循环从游标获取每一行并输出该行。
         x_row[0] = result[0]
         x_data = np.row_stack((x_data, x_row))  # 两个数组相加：加行
 
+        #此处可优化，合并同一sql，后期可优化
         sql = "select  task_name,record_id  from  ( " \
               "select aa.* ,  RANK() OVER(PARTITION BY aa.document_id  ORDER BY  aa.create_time ) a  from (" \
               "select tt.*, RANK() OVER(PARTITION BY tt.document_id,  tt.SRC_NODE_ID" \
@@ -47,11 +51,12 @@ def oracle_data():
 
         cursorV.execute(sql)
 
-        for resultV in cursorV:
-
-            y_row = label_map.get(resultV[0])
-            #y_row = hash(resultV[1])
-            y_data = np.append(y_data, y_row)  # 一个数组扩展：加列
+        #for resultV in cursorV:
+        #print(cursorV.fetchone()[0])
+        #目标只有一条，只取第一条
+        y_row = label_map.get(cursorV.fetchone()[0])
+        #y_row = hash(resultV[1])
+        y_data = np.append(y_data, y_row)  # 一个数组扩展：加列
 
     x_data = x_data[1:len(x_data)]
     y_data = y_data[1:len(y_data)]
@@ -61,7 +66,7 @@ def oracle_data():
     conn.close()
 
     # 数据整理
-    y_data = np.delete(y_data, [len(y_data)-1])
+   # y_data = np.delete(y_data, [len(y_data)-1])
     print(len(x_data))
     print(len(y_data))
     return x_data, y_data
