@@ -54,8 +54,9 @@ def oracle_data():
         #for resultV in cursorV:
         #print(cursorV.fetchone()[0])
         #目标只有一条，只取第一条
-        y_row = label_map.get(cursorV.fetchone()[0])
-        #y_row = hash(resultV[1])
+        a=cursorV.fetchone()
+        y_row[0] = label_map.get(a[0])
+        #y_row = hash(a[1])
         y_data = np.append(y_data, y_row)  # 一个数组扩展：加列
 
     x_data = x_data[1:len(x_data)]
@@ -97,7 +98,7 @@ def fc_layers(input_tensor, regularizer):
 
 def train(data, label, learning_rate, lambd, n_epoch, batch_size):
     # 划分训练集、测试集
-    test_radio = 0.2
+    test_radio = 0.9
     test_size = int(len(data) * test_radio)
     train_data = data[:-test_size]
     test_data = data[-test_size:]
@@ -106,7 +107,7 @@ def train(data, label, learning_rate, lambd, n_epoch, batch_size):
 
     # 搭建模型结构：定义输入数据、输出类别
     n_input = train_data.shape[1]  # 输入数量
-    n_output = len(set(train_label))  # 输出类别（去重）：14 个标签
+    n_output = max(train_label)+1 #len(set(train_label))  # 输出类别（去重）：14 个标签
     print("标签: ")
     print(set(train_label))
     print("n_output", n_output)
@@ -175,9 +176,13 @@ def train(data, label, learning_rate, lambd, n_epoch, batch_size):
             if (epoch+1) % 10 == 0:
                 print("Epoch:", epoch+1, "\tLoss:", loss_val, "\tAcc:", test_acc)
 
-        pred_label = predictions.eval(feed_dict={x: test_data, y: test_label})  # 对测试集进行预测：得到正确的标签。
-        print('precision_score：', precision_score(test_label, pred_label, average='macro'))  # 测试集预测的准确率
-        print('recall_score：', recall_score(test_label, pred_label, average='macro'))  # 测试集预测的召回率
+        pred_label = predictions.eval(feed_dict={x: test_data}) # 对测试集进行预测：得到正确的标签。
+        jayson_label = predictions.eval(feed_dict={x: [[800], [99999999999999999], [96000]]})
+        # print(test_data)
+        print(jayson_label)
+        # print(pred_label)
+        # print('precision_score：', precision_score(test_label, pred_label, average='weighted', labels=[2,3,4,6]))  # 测试集预测的准确率
+        # print('recall_score：', recall_score(test_label, pred_label, average='weighted'))  # 测试集预测的召回率
         sess.close()
 
 
@@ -190,10 +195,10 @@ if __name__ == '__main__':
 
 
 
-    learning_rate = 0.001  # 学习率
+    learning_rate = 0.01  # 学习率
     lambd = 0.01  # 正则化率
     n_epochs = 100
-    batch_size = 30
+    batch_size = 500
     train(X_data, y_data, learning_rate, lambd, n_epochs, batch_size)
 
 # 命令行启动tensorboard，可视化以保存的图。
