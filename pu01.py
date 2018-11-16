@@ -27,6 +27,17 @@ print(label_map1.get('入账后120天'))
 
 
 def oracle_data():
+
+
+    f = open('x_data.csv')
+    df = pd.read_csv(f)
+    x_data = np.array(df)
+
+    f = open('y_data.csv')
+    df = pd.read_csv(f)
+    y_data = np.array(df)
+
+
     conn = oracle.connect('csmart/csmart@192.168.1.69:1521/smartformsdb')
     cursor = conn.cursor()
     sql = "select  f.text1 , f.document_id  ,f.zje,f.currentsapfactory   from FORM_PU01 f  where  " \
@@ -95,6 +106,9 @@ def oracle_data():
    # y_data = np.delete(y_data, [len(y_data)-1])
     print(x_data)
     print(y_data)
+
+    #np.savetxt('C:\\Users\\Thinkpad\\Desktop\\x_data.csv', x_data, delimiter=',')
+    #np.savetxt('C:\\Users\\Thinkpad\\Desktop\\y_data.csv', y_data, delimiter=',')
     return x_data, y_data
 
 
