@@ -35,72 +35,13 @@ def oracle_data():
 
     f = open('y_data.csv')
     df = pd.read_csv(f)
-    y_data = np.array(df)
+    y_data_temp = np.array(df)
+    y_data = np.zeros(1)
+    for temp in y_data_temp:
+        #y_data.append(int(temp[0]))
+        y_data = np.append(y_data, temp[0])
 
-
-    conn = oracle.connect('csmart/csmart@192.168.1.69:1521/smartformsdb')
-    cursor = conn.cursor()
-    sql = "select  f.text1 , f.document_id  ,f.zje,f.currentsapfactory   from FORM_PU01 f  where  " \
-          "f.document_id  in (select document_id from PU01_EXPORT_TABLE)" \
-          " and f.currentsapfactory is not null and f.text1 is not null and f.zje is not null" \
-          "   "
-
-    cursor.execute(sql)
-
-    cursorV = conn.cursor()
-
-    x_data = np.zeros(3)
-    y_row = np.zeros(1)   #y目前只存放环节名称
-    y_data = np.zeros(1)  #zeros(1)创建长度1的全0数组(这个是一维的只有一行)
-    x_row = np.zeros(3)   #x目前只存放金额
-
-    # 堆叠数组：stack()，hstack()，vstack()
-    for result in cursor:  # 循环从游标获取每一行并输出该行。
-
-
-        #此处可优化，合并同一sql，后期可优化
-        sql = "select  task_name,record_id  from  ( " \
-              "select aa.* ,  RANK() OVER(PARTITION BY aa.document_id  ORDER BY  aa.create_time ) a  from (" \
-              "select tt.*, RANK() OVER(PARTITION BY tt.document_id,  tt.SRC_NODE_ID" \
-              " ORDER BY  tt.create_time ) sort2 from (" \
-              "select task_name, SRC_NODE_ID, document_id ,record_id, create_time ," \
-              "RANK() OVER(PARTITION BY document_id ORDER BY  create_time asc) sort " \
-              "from PU01_EXPORT_TABLE where EXCHANGE_TYPE='submit' and document_id='"+result[1]+"'" \
-              "order by document_id , create_time  asc) tt  order by document_id ,create_time asc ) aa " \
-              " where sort2 = 1) where a=2"
-
-        cursorV.execute(sql)
-
-        #for resultV in cursorV:
-        #print(cursorV.fetchone()[0])
-        #目标只有一条，只取第一条
-        all=cursorV.fetchall()
-        if len(all)>0:
-            #当经过第二个环节得文档才计入集合中
-            x_row[0] = label_map1.get(result[0])
-            x_row[1] = result[2]
-            x_row[2] = label_map2.get(result[3])
-            x_data = np.row_stack((x_data, x_row))  # 两个数组相加：加行
-
-
-            print(result[0])
-            print(label_map1.get(result[0]))
-
-            print(result[3])
-            print(label_map2.get(result[3]))
-
-            print(all[0][0])
-            print(label_map.get(all[0][0]))
-            y_row[0] = label_map.get(all[0][0])
-            #y_row = hash(a[1])
-            y_data = np.append(y_data, y_row)  # 一个数组扩展：加列
-
-    x_data = x_data[1:len(x_data)]
     y_data = y_data[1:len(y_data)]
-    # 关闭游标、oracle连接
-    cursor.close()
-    cursorV.close()
-    conn.close()
 
     # 数据整理
    # y_data = np.delete(y_data, [len(y_data)-1])
