@@ -34,4 +34,4 @@ if __name__ == '__main__':
     trainData, trainLabel = oracle_data()
     clf = tree.DecisionTreeClassifier()
     tree = clf.fit(trainData, trainLabel)
-    print(clf.predict([[11, 98000, 1], [11, 999999, 1], [8, 2400, 1]]))
+    print(clf.predict([[7,57600000,2,9020,16548.48], [11,892685.14,1,2050,769556.15], [7,263.95,1,3090,225.6]]))
