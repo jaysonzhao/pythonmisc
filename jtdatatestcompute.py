@@ -2,26 +2,28 @@ import csv
 import pandas as pd
 import numpy as np
 from dfa import dfa
+from scipy.signal import argrelextrema
+from scipy.spatial.distance import pdist
+
+def rollingDFA(narr):
+    scales, fluct, alpha = dfa(narr)
+    print("去趋势波动分析指数: {}", alpha)
+    return alpha
 
 
-with open('test.csv') as csvfile:
+with open('jtdataset\\speedupv1.csv') as csvfile:
     reader = csv.DictReader(csvfile)
     counter=0
-    # df = pd.DataFrame(columns={'time','temp'})
+
     arr = []
     for row in reader:
-        # s = dict()
-        # s['time']=counter
-        # s['temp']=row['CS_MetBox_Copper_Temp']
-        # counter+=1
-        # print(s)
-        #  dftemp = pd.DataFrame([s], columns={'time','temp'})
-        #  df = df.append(dftemp)
         try:
-            arr.append(float(row['CS_MetBox_Copper_Temp']))
+            # arr.append(float(row['Mill inlet temperature']))
+             arr.append(float(row['Caster_pool_level']))
         except ValueError:
             continue
     print(arr)
+
     #计算变化率
     result = []
     it = iter(arr)
@@ -32,7 +34,7 @@ with open('test.csv') as csvfile:
     # 求均值
     arr_mean = np.mean(arr)
     # 求方差
-    arr_var = np.var(arr)
+    arr_var = np.var(arr, ddof=1)
     # 求标准差
     arr_std = np.std(arr, ddof=1)
     print("平均值为：%f" % arr_mean)
@@ -40,9 +42,29 @@ with open('test.csv') as csvfile:
     print("标准差为:%f" % arr_std)
     print("最大值为:", max(arr))
     print("最小值为:", min(arr))
-    print("变化率:", result)
+    print("变化率方差:", np.var(result, ddof=1))
+    print("变化率max:", np.max(result))
+    logarr = np.log(arr)
 
+    print("log Volatility", (np.std(logarr, ddof=1)/np.mean(logarr))/np.sqrt(1/len(arr)))
+    c = pd.Series(arr).rolling(window=2400, center=False).var(ddof=1)
+    # v = pd.Series(arr).rolling(window=2400, center=False).apply(rollingDFA, raw=True)
+    # print('rolling dfa max: ', np.max(v))
+    print('rolling var:', np.max(c))
     scales, fluct, alpha = dfa(arr)
-    print("去趋势波动分析指数: {}".format(alpha))
-    # print(df)
-    # print('平均值 ',df.mean(column='temp'))
+    print("去趋势波动分析指数: {}", alpha)
+
+    x = np.array(arr)
+    # print(x)
+    maxpointspos = argrelextrema(x, np.greater, order=2400)[0]
+    print("极值点：", maxpointspos)
+    # curverate = []
+    # for i in maxpointspos:
+    #     x = (i - (i - 1), arr[i] - arr[i - 1])
+    #     y = (i + 1 - i, arr[i + 1] - arr[i])
+    #     d = 1 - pdist([x, y], 'cosine')
+    #     sin = np.sqrt(1 - d ** 2)
+    #     dis = np.sqrt((-2) ** 2 + (arr[i - 1] - arr[i + 1]) ** 2)
+    #     k = 2 * sin / dis
+    #     curverate.append(k)
+    # print("极值点圆周曲率 ", curverate)
