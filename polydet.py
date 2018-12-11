@@ -5,7 +5,7 @@ from sklearn.linear_model import LinearRegression, Perceptron
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 import csv
-filename = 'speedupv1.csv'
+filename = 'stablev3.csv'
 columnname = 'Caster_pool_level'
 with open('jtdataset\\'+filename) as csvfile:
     reader = csv.DictReader(csvfile)
@@ -22,7 +22,7 @@ X = np.array(range(0, len(arr), 1)).reshape(-1, 1)
 y = np.array(arr)
 # y = np.array([300,500,0,-10,0,20,200,300,1000,800,4000,5000,10000,9000,22000]).reshape(-1, 1)
 
-x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.6)
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.5)
 rmses = []
 degrees = np.arange(1, 10)
 min_rmse, min_deg, score = 1e10, 0, 0
