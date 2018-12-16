@@ -25,17 +25,17 @@ markdir['caster_lineSpeed'] = np.array([-1, 0, 0])
 markexpect['caster_pool_level'] = np.array([1.4, 2.0, 1.0])
 markdir['caster_pool_level'] = np.array([-0.4, -0.2, -0.4])
 
-dataresultname = 'dataresult1208'
+dataresultname = 'dataresult1209'
 for columnname in columnnames:
     resultfilename = dataresultname + columnname
     output = open('jtdataset\\' + resultfilename + '.csv', 'w')
     output.write("filename,column,avr,var,std,skew,kern,logviola,rollingvarmax,DFA,rollingvarmean,violmax,violmean," + '\n')
     output.close()
 
-for i in range(2145, 2441, 1):
+for i in range(2581, 2746, 1):
     filename = str(i) + '.csv'
     for columnname in columnnames:
-        with open('jtdataset\\8\\' + filename) as csvfile:
+        with open('jtdataset\\9\\' + filename) as csvfile:
             reader = csv.DictReader(csvfile)
             counter = 0
 
