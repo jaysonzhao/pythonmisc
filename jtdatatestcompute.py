@@ -18,24 +18,25 @@ columnnames = ['metbox_copperTemp', 'caster_pool_level', 'sr_position', 'Bartemp
 columnnamestomark = ['caster_pool_level', 'caster_lineSpeed', 'millinletTemp']
 markexpect = dict()
 markdir = dict()
-markexpect['millinletTemp']=np.array([1.1, 11, 15])
-markdir['millinletTemp'] = np.array([-0.4, -0.3, -0.3])
-markexpect['caster_lineSpeed'] = np.array([0.9, 1, 1])
-markdir['caster_lineSpeed'] = np.array([-1, 0, 0])
-markexpect['caster_pool_level'] = np.array([1.4, 2.0, 1.0])
-markdir['caster_pool_level'] = np.array([-0.4, -0.2, -0.4])
+#'DFA' 'violmax','rollingvarmax','std'
+markexpect['millinletTemp']=np.array([1.1, 11, 15, 2.2])
+markdir['millinletTemp'] = np.array([-0.3, -0.25, -0.25, -0.2])
+markexpect['caster_lineSpeed'] = np.array([0.8, 1, 1, 0.02])
+markdir['caster_lineSpeed'] = np.array([-0.9, 0, 0, -0.1])
+markexpect['caster_pool_level'] = np.array([1.4, 2.0, 1.0, 0.6])
+markdir['caster_pool_level'] = np.array([-0.35, -0.2, -0.35, -0.1])
 
-dataresultname = 'dataresult1208'
+dataresultname = 'dataresult1211'
 for columnname in columnnames:
     resultfilename = dataresultname + columnname
     output = open('jtdataset\\' + resultfilename + '.csv', 'w')
     output.write("filename,column,avr,var,std,skew,kern,logviola,rollingvarmax,DFA,rollingvarmean,violmax,violmean," + '\n')
     output.close()
 
-for i in range(2145, 2441, 1):
+for i in range(3054, 3388, 1):
     filename = str(i) + '.csv'
     for columnname in columnnames:
-        with open('jtdataset\\8\\' + filename) as csvfile:
+        with open('jtdataset\\11\\' + filename) as csvfile:
             reader = csv.DictReader(csvfile)
             counter = 0
 
@@ -142,7 +143,7 @@ for columnname in columnnamestomark:
         output = open('jtdataset\\'+resultfilename+'Mark.csv', 'w')
         for row in reader:
             try:
-                arr = np.array([float(row['DFA']), float(row['violmax']), float(row['rollingvarmax'])])
+                arr = np.array([float(row['DFA']), float(row['violmax']), float(row['rollingvarmax']), float(row['std'])])
 
                 output.write(row['filename'] + ',' + row['column'] + ',' + str(
                     np.sum(calpoint(arr, markexpect[columnname], markdir[columnname]))) + '\n')
