@@ -15,28 +15,31 @@ def calpoint(value, expect, direction):
 
 
 columnnames = ['metbox_copperTemp', 'caster_pool_level', 'sr_position', 'Bartemp', 'caster_lineSpeed', 'millinletTemp']
-columnnamestomark = ['caster_pool_level', 'caster_lineSpeed', 'millinletTemp']
+columnnamestomark = ['caster_pool_level', 'caster_lineSpeed', 'millinletTemp', 'sr_position']
 markexpect = dict()
 markdir = dict()
 #'DFA' 'violmax','rollingvarmax','std'
 markexpect['millinletTemp']=np.array([1.1, 11, 15, 2.2])
 markdir['millinletTemp'] = np.array([-0.3, -0.25, -0.25, -0.2])
-markexpect['caster_lineSpeed'] = np.array([0.8, 1, 1, 0.02])
-markdir['caster_lineSpeed'] = np.array([-0.9, 0, 0, -0.1])
+markexpect['caster_lineSpeed'] = np.array([0.9, 1, 1, 0.002])
+markdir['caster_lineSpeed'] = np.array([-0.8, 0, 0, -0.2])
 markexpect['caster_pool_level'] = np.array([1.4, 2.0, 1.0, 0.6])
 markdir['caster_pool_level'] = np.array([-0.35, -0.2, -0.35, -0.1])
+markexpect['sr_position'] = np.array([1.5, 0.5, 0.01, 0.1])
+markdir['sr_position'] = np.array([-0.3, -0.2, -0.2, -0.3])
 
-dataresultname = 'dataresult1211'
+dataresultname = 'dataresult1213300'
+rollingwindow = 300
 for columnname in columnnames:
     resultfilename = dataresultname + columnname
     output = open('jtdataset\\' + resultfilename + '.csv', 'w')
     output.write("filename,column,avr,var,std,skew,kern,logviola,rollingvarmax,DFA,rollingvarmean,violmax,violmean," + '\n')
     output.close()
 
-for i in range(3054, 3388, 1):
+for i in range(3648, 3942, 1):
     filename = str(i) + '.csv'
     for columnname in columnnames:
-        with open('jtdataset\\11\\' + filename) as csvfile:
+        with open('jtdataset\\13\\' + filename) as csvfile:
             reader = csv.DictReader(csvfile)
             counter = 0
 
@@ -73,7 +76,7 @@ for i in range(3054, 3388, 1):
             logarr = np.log(arr)
 
             logVolatility = np.std(logarr, ddof=1) / np.mean(logarr) / np.sqrt(1 / len(arr))
-            c = pd.Series(arr).rolling(window=600, center=False).var(ddof=1)
+            c = pd.Series(arr).rolling(window=rollingwindow, center=False).var(ddof=1)
             # v = pd.Series(arr).rolling(window=2400, center=False).apply(rollingDFA, raw=True)
             # print('rolling dfa max: ', np.max(v))
             rollingVarmax = np.max(c)
