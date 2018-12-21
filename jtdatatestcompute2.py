@@ -24,7 +24,7 @@ markdir['millinletTemp'] = np.array([-0.3, -0.25, -0.25, -0.2])
 markexpect['caster_lineSpeed'] = np.array([0.9, 1, 1, 0.002])
 markdir['caster_lineSpeed'] = np.array([-0.8, 0, 0, -0.2])
 markexpect['caster_pool_level'] = np.array([1.4, 2.0, 1.0, 0.6])
-markdir['caster_pool_level'] = np.array([-0.35, -0.2, -0.35, -0.1])
+markdir['caster_pool_level'] = np.array([-0.2, -0.2, -0.2, -0.4])
 markexpect['sr_position'] = np.array([1.5, 0.5, 0.01, 0.1])
 markdir['sr_position'] = np.array([-0.3, -0.2, -0.2, -0.3])
 
