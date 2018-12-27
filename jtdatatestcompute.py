@@ -1,36 +1,39 @@
 import csv
-import numpy as np
+
 import pandas as pd
-from scipy import stats
 from arch import arch_model  # GARCH(1,1)
-from matplotlib import pyplot as plt
-from datetime import timedelta
-from dfa import dfa
+from scipy import stats
+
 from Hurst import *
+from dfa import dfa
 
 
 # 计算得分value 为实际值 ，expect 是期望值， direction 是方向，也可用于权值，负数为越小越好，正数为越大越好.输入可以是NP ARRAY
 def calpoint(value, expect, direction):
     return (value - expect) * direction / expect
 
-# columnnames = ['metbox_copperTemp', 'caster_pool_level', 'sr_position', 'Bartemp', 'caster_lineSpeed', 'millinletTemp']
+columnnames = ['metbox_copperTemp', 'caster_pool_level', 'sr_position', 'Bartemp', 'caster_lineSpeed', 'millinletTemp']
 
-columnnames = ['caster_pool_level',  'millinletTemp']
-# columnnamestomark = ['caster_pool_level', 'caster_lineSpeed', 'millinletTemp', 'sr_position']
-columnnamestomark = ['caster_pool_level',  'millinletTemp']
+# columnnames = [ 'millinletTemp']
+columnnamestomark = ['caster_pool_level', 'caster_lineSpeed', 'millinletTemp', 'sr_position', 'Bartemp']
+# columnnamestomark = [ 'millinletTemp']
 markexpect = dict()
 markdir = dict()
-#'DFA' 'violmax','rollingvarmax','std'
-markexpect['millinletTemp']=np.array([1.1, 11, 15, 2.2])
-markdir['millinletTemp'] = np.array([-0.3, -0.25, -0.25, -0.2])
-markexpect['caster_lineSpeed'] = np.array([0.9, 1, 1, 0.002])
-markdir['caster_lineSpeed'] = np.array([-0.8, 0, 0, -0.2])
-markexpect['caster_pool_level'] = np.array([1.4, 2.0, 1.0, 0.6])
-markdir['caster_pool_level'] = np.array([-0.2, -0.2, -0.2, -0.4])
-markexpect['sr_position'] = np.array([1.5, 0.5, 0.01, 0.1])
-markdir['sr_position'] = np.array([-0.3, -0.2, -0.2, -0.3])
+#'DFA' 'violmax','rollingvarmax','std'，‘logvar'
+markexpect['millinletTemp']=np.array([1.1, 8, 9, 2.2, 1])
+markdir['millinletTemp'] = np.array([-0.3, -0.3, -0.2, -0.2, 0])
+#可能有过判
+markexpect['Bartemp']=np.array([1.1, 11, 15, 2.2, 1])
+markdir['Bartemp'] = np.array([-0.3, -0.25, -0.25, -0.2, 0])
+#相对保守可用的参数
+markexpect['caster_lineSpeed'] = np.array([0.9, 1, 1, 0.002, 1])
+markdir['caster_lineSpeed'] = np.array([-0.8, 0, 0, -0.2, 0])
+markexpect['caster_pool_level'] = np.array([1.4, 2.0, 1.0, 0.7, 0.5])
+markdir['caster_pool_level'] = np.array([-0.2, -0.1, -0.1, -0.3, -0.3])
+markexpect['sr_position'] = np.array([1.5, 0.5, 0.01, 0.1, 1])
+markdir['sr_position'] = np.array([-0.3, -0.2, -0.2, -0.3, 0])
 
-dataresultname = 'dataresult1221300'
+dataresultname = 'dataresult2713'
 rollingwindow = 300
 for columnname in columnnames:
     resultfilename = dataresultname + columnname
@@ -38,10 +41,10 @@ for columnname in columnnames:
     output.write("filename,column,avr,var,std,skew,kern,logviola,rollingvarmax,DFA,rollingvarmean,violmax,violmean," + '\n')
     output.close()
 
-for i in range(1219300, 1219303, 1):
+for i in range(3648, 3942, 1):
     filename = str(i) + '.csv'
     for columnname in columnnames:
-        with open('jtdataset\\19\\' + filename) as csvfile:
+        with open('jtdataset\\13\\' + filename) as csvfile:
             reader = csv.DictReader(csvfile)
             counter = 0
 
@@ -148,7 +151,7 @@ for columnname in columnnamestomark:
         output = open('jtdataset\\'+resultfilename+'Mark.csv', 'w')
         for row in reader:
             try:
-                arr = np.array([float(row['DFA']), float(row['violmax']), float(row['rollingvarmax']), float(row['std'])])
+                arr = np.array([float(row['DFA']), float(row['violmax']), float(row['rollingvarmax']), float(row['std']), float(row['logviola'])])
 
                 output.write(row['filename'] + ',' + row['column'] + ',' + str(
                     np.sum(calpoint(arr, markexpect[columnname], markdir[columnname]))) + '\n')

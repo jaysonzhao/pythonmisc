@@ -29,7 +29,7 @@ markexpect['sr_position'] = np.array([1.5, 0.5, 0.01, 0.1])
 markdir['sr_position'] = np.array([-0.3, -0.2, -0.2, -0.3])
 
 dataresultname = 'dataresult1213'
-rollingwindow = 600
+rollingwindow = 300
 for columnname in columnnames:
     resultfilename = dataresultname + columnname
     output = open('jtdataset\\' + resultfilename + '.csv', 'w')
